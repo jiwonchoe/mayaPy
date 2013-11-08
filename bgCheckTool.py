@@ -116,6 +116,10 @@ class bgCheckTool(QtGui.QWidget):
         animExportButton.clicked.connect(self.animOut)
         sceneSetButton.clicked.connect(self.fileName)
         loadButton.clicked.connect(self.addFile)
+        importMelButton.clicked.connect(self.importMel)
+        importMaButton.clicked.connect(self.importMa)
+        aboutFolderButton.clicked.connect(self.aboutMessage)
+        openFolderButton.clicked.connect(self.openFolder)
         
         # listWg set
         self.listWg.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
@@ -149,8 +153,8 @@ class bgCheckTool(QtGui.QWidget):
         fileLayout.addWidget(self.listFilewg)
         
         fileInAddLayout.addWidget(loadButton)
-        fileInAddLayout.addWidget(importMelButton)
         fileInAddLayout.addWidget(importMaButton)
+        fileInAddLayout.addWidget(importMelButton)
         fileInAddLayout.addWidget(openFolderButton)
         fileInAddLayout.addWidget(aboutFolderButton)
         fileInAddLayout.addWidget(textLabel)
@@ -165,7 +169,6 @@ class bgCheckTool(QtGui.QWidget):
         
         fileInLayout.addLayout(fileLayout)
         fileInLayout.addLayout(fileInAddLayout)
-        
         
         
         Layout04.addLayout(logLayout)
@@ -411,10 +414,42 @@ class bgCheckTool(QtGui.QWidget):
         if not fileName == '':
             outName = self.outPath.replace('untitled', fileName)
             self.outPathLineEditer.setText(outName)
+    
+    def importMel(self):
 
+        selectItem = self.listFilewg.selectedItems()[0]
+        path = os.path.dirname(str(self.outPathLineEditer.text()))
+        melfile = path + '/' + selectItem.text() + '.mel'
+        if os.path.isfile(melfile):
+            out = pm.mel.source(melfile)
+            inputText = 'import mel file\n' + out
+            self.logLabel.setText(inputText)
+        else:
+            inputText = 'import mel file\nmel file ??????'
+            self.logLabel.setText(inputText)
 
-### test run ###
-testz = bgCheckTool()
-testz.show()
+    def importMa(self):
 
+        selectItem = self.listFilewg.selectedItems()[0]
+        path = os.path.dirname(str(self.outPathLineEditer.text()))
+        mafile = path + '/' + selectItem.text() + '.ma'
+        if os.path.isfile(mafile):
+            pm.importFile(str(mafile))
+            inputText = 'import ma file\n' + mafile
+            self.logLabel.setText(inputText)
+        else:
+            inputText = 'import ma file\nma file ??????'
+            self.logLabel.setText(inputText)
+    
+    def aboutMessage(self):
         
+        message = QtGui.QMessageBox()
+        message.setWindowTitle('About')
+        message.setInformativeText('Give me Money')
+        message.exec_()
+
+    def openFolder(self):
+        
+        path = os.path.dirname(str(self.outPathLineEditer.text()))
+        subprocess.Popen(r'explorer.exe %s' % path.replace('/','\\'))
+

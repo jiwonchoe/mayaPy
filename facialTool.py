@@ -259,6 +259,3 @@ class facialTool(QtGui.QWidget):
     def mirror(self):
         self.nameCH.mouthMirror('mouth_ctr')
 
-
-test = facialTool()
-test.show()

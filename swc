@@ -1,0 +1,35 @@
+import pymel.core as pm
+
+get = pm.ls(sl=1)[0]
+
+aList = get.listAttr(ud=1)
+aList.index(aList[1])
+
+###
+
+attrName = 'swc'
+objList = pm.ls(sl=1)
+
+center = pm.createNode('locator').getParent()
+constrain = pm.pointConstraint(objList[0], objList[1], center)
+center.addAttr(attrName, min=0, max=10, at='float', k=1)
+
+mtdNode = pm.createNode('multiplyDivide')
+swcAttr = center.attr(attrName)
+
+swcAttr >> mtdNode.input1X
+mtdNode.input2X.set(.1)
+
+swcAttr >> mtdNode.input1Y
+mtdNode.input2Y.set(.1)
+
+reverse = pm.createNode('reverse')
+
+mtdNode.outputY >> reverse.inputX
+
+mtdNode.outputX >> constrain.w0
+reverse.outputX >> constrain.w1
+
+swcAttr.set(5)
+
+###

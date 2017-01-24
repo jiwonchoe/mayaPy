@@ -28,7 +28,7 @@ class FoDoRi(QtGui.QWidget):
         
         self.closeCheck()
 
-        super(Fordori, self).__init__(parent)
+        super(FoDoRi, self).__init__(parent)
         
         ### deco
 

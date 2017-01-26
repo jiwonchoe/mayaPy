@@ -40,13 +40,6 @@ class FoDoRi(QtGui.QWidget):
         titleFT.setBold(1)
         titleFT.setPointSize(20)
         
-        titleLB = QtGui.QLabel('FoDoRiTooL')
-        titleLB.setAlignment(QtCore.Qt.AlignCenter)
-        titleLB.setPalette(titleP)
-        titleLB.setFont(titleFT)
-        titleLB.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain)
-        titleLB.setAutoFillBackground(1)
-        
         lineFT = QtGui.QFont()
         lineFT.setBold(1)
         lineFT.setPointSize(16)
@@ -60,7 +53,7 @@ class FoDoRi(QtGui.QWidget):
         buttonFT = QtGui.QFont()
         buttonFT.setBold(1)
         buttonFT.setPointSize(10)
-
+        
         makerP = QtGui.QPalette()
         makerP.setColor(QtGui.QPalette.Foreground, QtGui.QColor(0, 255, 0))
         makerP.setColor(QtGui.QPalette.Background, QtGui.QColor(10, 10, 10))
@@ -69,15 +62,31 @@ class FoDoRi(QtGui.QWidget):
         makerFT.setBold(1)
         makerFT.setPointSize(7)
         
-        makerLB = QtGui.QLabel('Written by jiwon choi | jiwonkun@gmail.com')
+        makerLB = QtGui.QLabel('Written by jiwon choi | choijw@locus.com')
         makerLB.setPalette(makerP)
         makerLB.setFont(makerFT)
         makerLB.setAlignment(QtCore.Qt.AlignCenter)
         makerLB.setAutoFillBackground(1)
-
+        
+        labelFT = QtGui.QFont()
+        labelFT.setBold(1)
+        
+        labelP = QtGui.QPalette()
+        labelP.setColor(QtGui.QPalette.Foreground, QtGui.QColor(40, 40, 40))
+        
         ### widget
+
+
+        titleLB = QtGui.QLabel('FoDoRiTooL')
+        titleLB.setAlignment(QtCore.Qt.AlignCenter)
+        titleLB.setPalette(titleP)
+        titleLB.setFont(titleFT)
+        titleLB.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain)
+        titleLB.setAutoFillBackground(1)
         
         nodeLB = QtGui.QLabel('Search Node : ')
+        nodeLB.setFont(labelFT)
+        nodeLB.setPalette(labelP)
         
         self.completer = QtGui.QCompleter()
         self.setModelNode()
@@ -107,20 +116,27 @@ class FoDoRi(QtGui.QWidget):
         #
         
         attrListLB = QtGui.QLabel('Attr List : ')
+        attrListLB.setFont(labelFT)
+        attrListLB.setPalette(labelP)
 
         self.weightListWidget = QtGui.QListWidget()
         self.weightListWidget.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         self.weightListWidget.setFont(listFT)
         self.weightListWidget.setPalette(listP)
+        self.weightListWidget.itemSelectionChanged.connect(self.getAttrNode)
 
         filterAttrLB = QtGui.QLabel('Filter attr : ')
+        filterAttrLB.setFont(labelFT)
+        filterAttrLB.setPalette(labelP)
         
         self.attrFilterLine = QtGui.QLineEdit('')
         self.attrFilterLine.setAlignment(QtCore.Qt.AlignCenter)
         self.attrFilterLine.returnPressed.connect(self.attrFilter)
         self.attrFilterLine.setFont(lineFT)
         
-        valueLB = QtGui.QLabel('Vale : ')
+        valueLB = QtGui.QLabel('Value : ')
+        valueLB.setFont(labelFT)
+        valueLB.setPalette(labelP)
         
         self.setValueLine = QtGui.QLineEdit()
         self.setValueLine.setText('0.0')
@@ -133,16 +149,34 @@ class FoDoRi(QtGui.QWidget):
         setAttrB.setFont(buttonFT)
         setAttrB.clicked.connect(self.run)
         
-        overrideB = QtGui.QPushButton('Override')
-        overrideB.setFont(buttonFT)
-        overrideB.clicked.connect(self.overrideAttrRun)
+        overrideCrB = QtGui.QPushButton('Override Create')
+        overrideCrB.setFont(buttonFT)
+        overrideCrB.clicked.connect(lambda : self.overrideAttrRun(True))
+        
+        overrideRmB = QtGui.QPushButton('Override Remove')
+        overrideRmB.setFont(buttonFT)
+        overrideRmB.clicked.connect(lambda : self.overrideAttrRun(False))
 
         closeB = QtGui.QPushButton('Close')
         closeB.setFont(buttonFT)
         closeB.clicked.connect(self.close)
+
         sizeG = QtGui.QSizeGrip(self)
         
         ### layer
+        
+        inButtonLayout = QtGui.QHBoxLayout()
+        inButtonLayout.setSpacing(1)
+        
+        inButtonLayout.addWidget(overrideCrB)
+        inButtonLayout.addWidget(overrideRmB)
+        
+        buttonLayout = QtGui.QVBoxLayout()
+        buttonLayout.setSpacing(1)
+
+        buttonLayout.addWidget(setAttrB)
+        buttonLayout.addLayout(inButtonLayout)
+        buttonLayout.addWidget(closeB)        
         
         mainLayout = QtGui.QVBoxLayout()
         
@@ -158,9 +192,7 @@ class FoDoRi(QtGui.QWidget):
         mainLayout.addWidget(self.attrFilterLine)
         mainLayout.addWidget(valueLB)
         mainLayout.addWidget(self.setValueLine)
-        mainLayout.addWidget(setAttrB)
-        mainLayout.addWidget(overrideB)
-        mainLayout.addWidget(closeB)
+        mainLayout.addLayout(buttonLayout)
         mainLayout.addWidget(makerLB)
         mainLayout.addWidget(sizeG, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
 
@@ -171,6 +203,22 @@ class FoDoRi(QtGui.QWidget):
         self.setObjectName('ForDoRiUI')
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
+
+    
+    def getAttrNode(self):
+        
+        try:
+            valueOrg = self.obj.attr(self.weightListWidget.currentItem().text()).get()
+        except:
+            valueOrg = 0
+        
+        if type(valueOrg) == bool:
+            valueOrg = int(valueOrg)
+        
+        value = unicode(valueOrg)
+        
+        self.setValueLine.setText(value)
+
 
     def setModelNode(self):
 
@@ -209,14 +257,14 @@ class FoDoRi(QtGui.QWidget):
         if not len(self.objectList):
             return 0
 
-        obj = self.objectList[-1]
+        self.obj = self.objectList[-1]
                 
-        self.objAttrList = pm.listAttr(obj, s=1)
+        self.objAttrList = pm.listAttr(self.obj, s=1)
         
         self.weightListWidget.clear()
         self.weightListWidget.addItems(self.objAttrList)
         
-        self.nodeLineEdit.setText(obj.nodeType())
+        self.nodeLineEdit.setText(self.obj.nodeType())
 
 
     def attrFilter(self):
@@ -255,7 +303,7 @@ class FoDoRi(QtGui.QWidget):
         pm.undoInfo(cck=1)
 
     
-    def overrideAttrRun(self):
+    def overrideAttrRun(self, mode):
 
         items = self.weightListWidget.selectedItems()
         
@@ -263,8 +311,6 @@ class FoDoRi(QtGui.QWidget):
             return 0
 
         attrList = []
-        
-        print self.objectList
         
         pm.undoInfo(ock=1)        
         
@@ -274,7 +320,12 @@ class FoDoRi(QtGui.QWidget):
         for x in self.objectList:
             for y in attrList:
                 try:
-                    pm.editRenderLayerAdjustment(x.attr(y))
+                    if mode:
+                        pm.editRenderLayerAdjustment(x.attr(y))
+                    else:
+                        overrideList = pm.editRenderLayerAdjustment(q=1)
+                        if x.attr(y).name() in overrideList:
+                            pm.editRenderLayerAdjustment(x.attr(y), remove=1)
                 except:
                     print x                
         
@@ -303,6 +354,7 @@ class FoDoRi(QtGui.QWidget):
                     x.close()
             except:
                 pass
- 
+
+
 FoDoRiRun = FoDoRi()
 FoDoRiRun.show()

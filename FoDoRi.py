@@ -62,12 +62,6 @@ class FoDoRi(QtGui.QWidget):
         makerFT.setBold(1)
         makerFT.setPointSize(7)
         
-        makerLB = QtGui.QLabel('Written by jiwon choi | choijw@locus.com')
-        makerLB.setPalette(makerP)
-        makerLB.setFont(makerFT)
-        makerLB.setAlignment(QtCore.Qt.AlignCenter)
-        makerLB.setAutoFillBackground(1)
-        
         labelFT = QtGui.QFont()
         labelFT.setBold(1)
         
@@ -76,14 +70,19 @@ class FoDoRi(QtGui.QWidget):
         
         ### widget
 
-
         titleLB = QtGui.QLabel('FoDoRiTooL')
         titleLB.setAlignment(QtCore.Qt.AlignCenter)
         titleLB.setPalette(titleP)
         titleLB.setFont(titleFT)
         titleLB.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain)
         titleLB.setAutoFillBackground(1)
-        
+
+        makerLB = QtGui.QLabel('Written by jiwon choi | jiwonkun@gmail.com')
+        makerLB.setPalette(makerP)
+        makerLB.setFont(makerFT)
+        makerLB.setAlignment(QtCore.Qt.AlignCenter)
+        makerLB.setAutoFillBackground(1)        
+
         nodeLB = QtGui.QLabel('Search Node : ')
         nodeLB.setFont(labelFT)
         nodeLB.setPalette(labelP)
